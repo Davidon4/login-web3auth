@@ -3,26 +3,50 @@ import { Alert, Button, StyleSheet, Text, View } from "react-native";
 import { useAuth0, Auth0Provider } from "react-native-auth0";
 import config from "./auth0-configuration";
 
-const Home = () => {
-  const { authorize, clearSession, user, error, getCredentials, isLoading } =
-    useAuth0();
+// Define types for configuration
+interface Auth0Config {
+  domain: string;
+  clientId: string;
+}
 
-  const onLogin = async () => {
+// Define type for user object
+interface User {
+  name: string;
+  // Add other user properties as needed
+}
+
+// Define type for credentials
+interface Credentials {
+  accessToken: string;
+  // Add other credential properties if needed
+}
+
+const Home: React.FC = () => {
+  const { 
+    authorize, 
+    clearSession, 
+    user, 
+    error, 
+    getCredentials, 
+    isLoading 
+  } = useAuth0<User>();
+
+  const onLogin = async (): Promise<void> => {
     try {
       await authorize();
       let credentials = await getCredentials();
-      Alert.alert("AccessToken: " + credentials.accessToken);
-    } catch (e) {
+      Alert.alert("AccessToken: " + credentials?.accessToken);
+    } catch (e: unknown) {
       console.log(e);
     }
   };
 
   const loggedIn = user !== undefined && user !== null;
 
-  const onLogout = async () => {
+  const onLogout = async (): Promise<void> => {
     try {
       await clearSession();
-    } catch (e) {
+    } catch (e: unknown) {
       console.log("Log out cancelled");
     }
   };
@@ -48,7 +72,7 @@ const Home = () => {
   );
 };
 
-const App = () => {
+const App: React.FC = () => {
   return (
     <Auth0Provider domain={config.domain} clientId={config.clientId}>
       <Home />
